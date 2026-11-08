@@ -1,0 +1,428 @@
+{
+  "timestamp": "2026-11-08T21:23:03Z",
+  "benchmark_version": "AgentGit 2.0 Evaluation Suite",
+  "repository": "AgentGit",
+  "total_tasks": 10,
+  "token_reduction_vs_normal_baseline_pct": 69.4,
+  "token_reduction_vs_rules_only_pct": -19.9,
+  "aggregates": {
+    "normal_baseline": {
+      "avg_supplied_tokens": 1039.8,
+      "total_supplied_tokens": 10398,
+      "avg_files_inspected": 5.5,
+      "avg_search_tool_calls": 7.5,
+      "avg_retrieval_latency_ms": 1.32,
+      "avg_constraint_recall_pct": 0.0,
+      "total_acceptance_passed": 0,
+      "total_acceptance_tasks": 10,
+      "acceptance_pass_rate_pct": 0.0,
+      "total_stale_context_errors": 1
+    },
+    "rules_only": {
+      "avg_supplied_tokens": 265.3,
+      "total_supplied_tokens": 2653,
+      "avg_files_inspected": 1.6,
+      "avg_search_tool_calls": 2.6,
+      "avg_retrieval_latency_ms": 0.4,
+      "avg_constraint_recall_pct": 10.0,
+      "total_acceptance_passed": 0,
+      "total_acceptance_tasks": 10,
+      "acceptance_pass_rate_pct": 0.0,
+      "total_stale_context_errors": 1
+    },
+    "agentgit_2_0": {
+      "avg_supplied_tokens": 318.2,
+      "total_supplied_tokens": 3182,
+      "avg_files_inspected": 5,
+      "avg_search_tool_calls": 1,
+      "avg_retrieval_latency_ms": 14.45,
+      "avg_constraint_recall_pct": 90.0,
+      "total_acceptance_passed": 10,
+      "total_acceptance_tasks": 10,
+      "acceptance_pass_rate_pct": 100.0,
+      "total_stale_context_errors": 0
+    }
+  },
+  "task_breakdown": [
+    {
+      "task_id": "TASK-01",
+      "category": "Small isolated change",
+      "title": "Update JWT token expiration duration in auth config",
+      "normal_baseline": {
+        "condition": "Normal Baseline",
+        "task_id": "TASK-01",
+        "supplied_tokens": 1054,
+        "files_inspected": 6,
+        "search_tool_calls": 8,
+        "retrieval_latency_ms": 1.41,
+        "constraint_recall_pct": 0.0,
+        "acceptance_tests_passed": 0,
+        "stale_context_errors": 0
+      },
+      "rules_only": {
+        "condition": "Rules-only",
+        "task_id": "TASK-01",
+        "supplied_tokens": 115,
+        "files_inspected": 1,
+        "search_tool_calls": 2,
+        "retrieval_latency_ms": 0.23,
+        "constraint_recall_pct": 10.0,
+        "acceptance_tests_passed": 0,
+        "stale_context_errors": 0
+      },
+      "agentgit_2_0": {
+        "condition": "AgentGit 2.0",
+        "task_id": "TASK-01",
+        "supplied_tokens": 281,
+        "files_inspected": 5,
+        "search_tool_calls": 1,
+        "retrieval_latency_ms": 18.82,
+        "constraint_recall_pct": 100.0,
+        "acceptance_tests_passed": 1,
+        "stale_context_errors": 0
+      }
+    },
+    {
+      "task_id": "TASK-02",
+      "category": "API/backend change",
+      "title": "Add audit log export endpoint in version API",
+      "normal_baseline": {
+        "condition": "Normal Baseline",
+        "task_id": "TASK-02",
+        "supplied_tokens": 1029,
+        "files_inspected": 6,
+        "search_tool_calls": 8,
+        "retrieval_latency_ms": 1.4,
+        "constraint_recall_pct": 0.0,
+        "acceptance_tests_passed": 0,
+        "stale_context_errors": 0
+      },
+      "rules_only": {
+        "condition": "Rules-only",
+        "task_id": "TASK-02",
+        "supplied_tokens": 305,
+        "files_inspected": 2,
+        "search_tool_calls": 3,
+        "retrieval_latency_ms": 0.42,
+        "constraint_recall_pct": 10.0,
+        "acceptance_tests_passed": 0,
+        "stale_context_errors": 0
+      },
+      "agentgit_2_0": {
+        "condition": "AgentGit 2.0",
+        "task_id": "TASK-02",
+        "supplied_tokens": 316,
+        "files_inspected": 5,
+        "search_tool_calls": 1,
+        "retrieval_latency_ms": 12.99,
+        "constraint_recall_pct": 100.0,
+        "acceptance_tests_passed": 1,
+        "stale_context_errors": 0
+      }
+    },
+    {
+      "task_id": "TASK-03",
+      "category": "Cross-file feature",
+      "title": "Add user roles verification across router and session models",
+      "normal_baseline": {
+        "condition": "Normal Baseline",
+        "task_id": "TASK-03",
+        "supplied_tokens": 1107,
+        "files_inspected": 7,
+        "search_tool_calls": 9,
+        "retrieval_latency_ms": 1.53,
+        "constraint_recall_pct": 0.0,
+        "acceptance_tests_passed": 0,
+        "stale_context_errors": 0
+      },
+      "rules_only": {
+        "condition": "Rules-only",
+        "task_id": "TASK-03",
+        "supplied_tokens": 370,
+        "files_inspected": 3,
+        "search_tool_calls": 4,
+        "retrieval_latency_ms": 1.11,
+        "constraint_recall_pct": 10.0,
+        "acceptance_tests_passed": 0,
+        "stale_context_errors": 0
+      },
+      "agentgit_2_0": {
+        "condition": "AgentGit 2.0",
+        "task_id": "TASK-03",
+        "supplied_tokens": 282,
+        "files_inspected": 5,
+        "search_tool_calls": 1,
+        "retrieval_latency_ms": 15.04,
+        "constraint_recall_pct": 50.0,
+        "acceptance_tests_passed": 1,
+        "stale_context_errors": 0
+      }
+    },
+    {
+      "task_id": "TASK-04",
+      "category": "Refactor with dependencies",
+      "title": "Refactor compute_snapshot_hash to extract canonical serializer",
+      "normal_baseline": {
+        "condition": "Normal Baseline",
+        "task_id": "TASK-04",
+        "supplied_tokens": 1107,
+        "files_inspected": 6,
+        "search_tool_calls": 8,
+        "retrieval_latency_ms": 1.63,
+        "constraint_recall_pct": 0.0,
+        "acceptance_tests_passed": 0,
+        "stale_context_errors": 0
+      },
+      "rules_only": {
+        "condition": "Rules-only",
+        "task_id": "TASK-04",
+        "supplied_tokens": 365,
+        "files_inspected": 2,
+        "search_tool_calls": 3,
+        "retrieval_latency_ms": 0.64,
+        "constraint_recall_pct": 10.0,
+        "acceptance_tests_passed": 0,
+        "stale_context_errors": 0
+      },
+      "agentgit_2_0": {
+        "condition": "AgentGit 2.0",
+        "task_id": "TASK-04",
+        "supplied_tokens": 370,
+        "files_inspected": 5,
+        "search_tool_calls": 1,
+        "retrieval_latency_ms": 14.36,
+        "constraint_recall_pct": 100.0,
+        "acceptance_tests_passed": 1,
+        "stale_context_errors": 0
+      }
+    },
+    {
+      "task_id": "TASK-05",
+      "category": "Bug fix requiring historical decision",
+      "title": "Fix session timeout handling respecting RS256 constraint",
+      "normal_baseline": {
+        "condition": "Normal Baseline",
+        "task_id": "TASK-05",
+        "supplied_tokens": 861,
+        "files_inspected": 5,
+        "search_tool_calls": 7,
+        "retrieval_latency_ms": 1.19,
+        "constraint_recall_pct": 0.0,
+        "acceptance_tests_passed": 0,
+        "stale_context_errors": 0
+      },
+      "rules_only": {
+        "condition": "Rules-only",
+        "task_id": "TASK-05",
+        "supplied_tokens": 115,
+        "files_inspected": 1,
+        "search_tool_calls": 2,
+        "retrieval_latency_ms": 0.24,
+        "constraint_recall_pct": 10.0,
+        "acceptance_tests_passed": 0,
+        "stale_context_errors": 0
+      },
+      "agentgit_2_0": {
+        "condition": "AgentGit 2.0",
+        "task_id": "TASK-05",
+        "supplied_tokens": 235,
+        "files_inspected": 5,
+        "search_tool_calls": 1,
+        "retrieval_latency_ms": 12.55,
+        "constraint_recall_pct": 100.0,
+        "acceptance_tests_passed": 1,
+        "stale_context_errors": 0
+      }
+    },
+    {
+      "task_id": "TASK-06",
+      "category": "Task requiring exact constraint",
+      "title": "Ensure memory items never persist raw secret keys or plaintext passwords",
+      "normal_baseline": {
+        "condition": "Normal Baseline",
+        "task_id": "TASK-06",
+        "supplied_tokens": 1237,
+        "files_inspected": 6,
+        "search_tool_calls": 8,
+        "retrieval_latency_ms": 1.48,
+        "constraint_recall_pct": 0.0,
+        "acceptance_tests_passed": 0,
+        "stale_context_errors": 0
+      },
+      "rules_only": {
+        "condition": "Rules-only",
+        "task_id": "TASK-06",
+        "supplied_tokens": 293,
+        "files_inspected": 2,
+        "search_tool_calls": 3,
+        "retrieval_latency_ms": 0.38,
+        "constraint_recall_pct": 10.0,
+        "acceptance_tests_passed": 0,
+        "stale_context_errors": 0
+      },
+      "agentgit_2_0": {
+        "condition": "AgentGit 2.0",
+        "task_id": "TASK-06",
+        "supplied_tokens": 320,
+        "files_inspected": 5,
+        "search_tool_calls": 1,
+        "retrieval_latency_ms": 14.23,
+        "constraint_recall_pct": 100.0,
+        "acceptance_tests_passed": 1,
+        "stale_context_errors": 0
+      }
+    },
+    {
+      "task_id": "TASK-07",
+      "category": "API/backend change",
+      "title": "Add commit tag and release metadata to version service",
+      "normal_baseline": {
+        "condition": "Normal Baseline",
+        "task_id": "TASK-07",
+        "supplied_tokens": 1068,
+        "files_inspected": 6,
+        "search_tool_calls": 8,
+        "retrieval_latency_ms": 1.24,
+        "constraint_recall_pct": 0.0,
+        "acceptance_tests_passed": 0,
+        "stale_context_errors": 0
+      },
+      "rules_only": {
+        "condition": "Rules-only",
+        "task_id": "TASK-07",
+        "supplied_tokens": 376,
+        "files_inspected": 2,
+        "search_tool_calls": 3,
+        "retrieval_latency_ms": 0.38,
+        "constraint_recall_pct": 10.0,
+        "acceptance_tests_passed": 0,
+        "stale_context_errors": 0
+      },
+      "agentgit_2_0": {
+        "condition": "AgentGit 2.0",
+        "task_id": "TASK-07",
+        "supplied_tokens": 445,
+        "files_inspected": 5,
+        "search_tool_calls": 1,
+        "retrieval_latency_ms": 14.21,
+        "constraint_recall_pct": 50.0,
+        "acceptance_tests_passed": 1,
+        "stale_context_errors": 0
+      }
+    },
+    {
+      "task_id": "TASK-08",
+      "category": "Refactor with dependencies",
+      "title": "Add relevance threshold filtering to memory retrieval service",
+      "normal_baseline": {
+        "condition": "Normal Baseline",
+        "task_id": "TASK-08",
+        "supplied_tokens": 858,
+        "files_inspected": 3,
+        "search_tool_calls": 5,
+        "retrieval_latency_ms": 0.75,
+        "constraint_recall_pct": 0.0,
+        "acceptance_tests_passed": 0,
+        "stale_context_errors": 0
+      },
+      "rules_only": {
+        "condition": "Rules-only",
+        "task_id": "TASK-08",
+        "supplied_tokens": 233,
+        "files_inspected": 1,
+        "search_tool_calls": 2,
+        "retrieval_latency_ms": 0.24,
+        "constraint_recall_pct": 10.0,
+        "acceptance_tests_passed": 0,
+        "stale_context_errors": 0
+      },
+      "agentgit_2_0": {
+        "condition": "AgentGit 2.0",
+        "task_id": "TASK-08",
+        "supplied_tokens": 274,
+        "files_inspected": 5,
+        "search_tool_calls": 1,
+        "retrieval_latency_ms": 13.6,
+        "constraint_recall_pct": 100.0,
+        "acceptance_tests_passed": 1,
+        "stale_context_errors": 0
+      }
+    },
+    {
+      "task_id": "TASK-09",
+      "category": "Small isolated change",
+      "title": "Detect and flag modified source files before executing task context assembly",
+      "normal_baseline": {
+        "condition": "Normal Baseline",
+        "task_id": "TASK-09",
+        "supplied_tokens": 1139,
+        "files_inspected": 4,
+        "search_tool_calls": 6,
+        "retrieval_latency_ms": 1.0,
+        "constraint_recall_pct": 0.0,
+        "acceptance_tests_passed": 0,
+        "stale_context_errors": 1
+      },
+      "rules_only": {
+        "condition": "Rules-only",
+        "task_id": "TASK-09",
+        "supplied_tokens": 245,
+        "files_inspected": 1,
+        "search_tool_calls": 2,
+        "retrieval_latency_ms": 0.2,
+        "constraint_recall_pct": 10.0,
+        "acceptance_tests_passed": 0,
+        "stale_context_errors": 1
+      },
+      "agentgit_2_0": {
+        "condition": "AgentGit 2.0",
+        "task_id": "TASK-09",
+        "supplied_tokens": 333,
+        "files_inspected": 5,
+        "search_tool_calls": 1,
+        "retrieval_latency_ms": 13.87,
+        "constraint_recall_pct": 100.0,
+        "acceptance_tests_passed": 1,
+        "stale_context_errors": 0
+      }
+    },
+    {
+      "task_id": "TASK-10",
+      "category": "Bug fix requiring historical decision",
+      "title": "Multi-branch merge workflow with PostgreSQL vs SQLite conflict resolution",
+      "normal_baseline": {
+        "condition": "Normal Baseline",
+        "task_id": "TASK-10",
+        "supplied_tokens": 938,
+        "files_inspected": 6,
+        "search_tool_calls": 8,
+        "retrieval_latency_ms": 1.57,
+        "constraint_recall_pct": 0.0,
+        "acceptance_tests_passed": 0,
+        "stale_context_errors": 0
+      },
+      "rules_only": {
+        "condition": "Rules-only",
+        "task_id": "TASK-10",
+        "supplied_tokens": 236,
+        "files_inspected": 1,
+        "search_tool_calls": 2,
+        "retrieval_latency_ms": 0.2,
+        "constraint_recall_pct": 10.0,
+        "acceptance_tests_passed": 0,
+        "stale_context_errors": 0
+      },
+      "agentgit_2_0": {
+        "condition": "AgentGit 2.0",
+        "task_id": "TASK-10",
+        "supplied_tokens": 326,
+        "files_inspected": 5,
+        "search_tool_calls": 1,
+        "retrieval_latency_ms": 14.83,
+        "constraint_recall_pct": 100.0,
+        "acceptance_tests_passed": 1,
+        "stale_context_errors": 0
+      }
+    }
+  ]
+}

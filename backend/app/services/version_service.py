@@ -45,15 +45,30 @@ class VersionService:
         self.audit = AuditService(db)
 
     # Repository management
-    def get_or_create_repository(self, name: str = "default", description: Optional[str] = None) -> Repository:
-        stmt = select(Repository).where(Repository.name == name)
+    def get_repository_by_id_or_name(self, identifier: str) -> Optional[Repository]:
+        # Check by ID first
+        stmt = select(Repository).where(Repository.id == identifier)
         repo = self.db.scalars(stmt).first()
+        if repo:
+            return repo
+        # Check by Name
+        stmt = select(Repository).where(Repository.name == identifier)
+        return self.db.scalars(stmt).first()
+
+    def get_or_create_repository(
+        self,
+        name: str = "default",
+        description: Optional[str] = None,
+        identifier: Optional[str] = None
+    ) -> Repository:
+        target = identifier or name
+        repo = self.get_repository_by_id_or_name(target)
         if not repo:
             repo_id = str(uuid.uuid4())
             repo = Repository(
                 id=repo_id,
-                name=name,
-                description=description or "Default AgentGit Repository",
+                name=target,
+                description=description or f"AgentGit Repository: {target}",
                 default_branch="main"
             )
             self.db.add(repo)
@@ -70,12 +85,11 @@ class VersionService:
             self.db.add(main_branch)
             self.db.commit()
             self.db.refresh(repo)
-            self.audit.record_event("repository_create", entity_id=repo.id, payload={"name": name})
+            self.audit.record_event("repository_create", entity_id=repo.id, payload={"name": target})
         return repo
 
     def get_repository(self, repo_id: str) -> Optional[Repository]:
-        stmt = select(Repository).where(Repository.id == repo_id)
-        return self.db.scalars(stmt).first()
+        return self.get_repository_by_id_or_name(repo_id)
 
     def list_repositories(self) -> List[Repository]:
         stmt = select(Repository).order_by(Repository.created_at.desc())
@@ -83,14 +97,18 @@ class VersionService:
 
     # Branch management
     def get_branch(self, repository_id: str, branch_name: str) -> Optional[Branch]:
+        repo = self.get_repository(repository_id)
+        target_id = repo.id if repo else repository_id
         stmt = select(Branch).where(
-            Branch.repository_id == repository_id,
+            Branch.repository_id == target_id,
             Branch.name == branch_name
         )
         return self.db.scalars(stmt).first()
 
     def list_branches(self, repository_id: str) -> List[Branch]:
-        stmt = select(Branch).where(Branch.repository_id == repository_id).order_by(Branch.created_at.asc())
+        repo = self.get_repository(repository_id)
+        target_id = repo.id if repo else repository_id
+        stmt = select(Branch).where(Branch.repository_id == target_id).order_by(Branch.created_at.asc())
         return list(self.db.scalars(stmt).all())
 
     def create_branch(self, repository_id: str, name: str, from_commit_id: Optional[str] = None) -> Branch:

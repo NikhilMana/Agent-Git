@@ -1,6 +1,7 @@
 import json
 import os
 import sys
+import uuid
 from backend.app.db.session import SessionLocal, create_all_tables
 from backend.app.services.ingestion import IngestionService
 from backend.app.services.extractor import CandidateExtractor
@@ -68,7 +69,8 @@ def run_demo():
 
     # Step 3: Initial Memory Commit on main
     print("\n[Step 3] Creating Initial Immutable Memory Commit on 'main' branch...")
-    repo = version_svc.get_or_create_repository("demo-repo", "AgentGit Live Demo Repository")
+    repo_name = f"demo-repo-{uuid.uuid4().hex[:6]}"
+    repo = version_svc.get_or_create_repository(repo_name, "AgentGit Live Demo Repository")
     c1 = version_svc.create_commit(
         repo.id,
         CommitCreate(

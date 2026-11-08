@@ -53,6 +53,18 @@ from backend.app.schemas.retrieval import (
 from backend.app.schemas.audit import (
     AuditEventResponse,
 )
+from backend.app.schemas.codebase import (
+    CodebaseFileSummary,
+    CodebaseSymbolSummary,
+    CodebaseDependencySummary,
+    CodebaseIndexStatus,
+    IndexRefreshReport,
+)
+from backend.app.schemas.task_context import (
+    TaskContextRequest,
+    TaskOutcomeRequest,
+    TaskContextResponse,
+)
 
 __all__ = [
     "RoleEnum",
@@ -90,5 +102,12 @@ __all__ = [
     "RetrievedMemoryItem",
     "RetrievalResponse",
     "AuditEventResponse",
+    "CodebaseFileSummary",
+    "CodebaseSymbolSummary",
+    "CodebaseDependencySummary",
+    "CodebaseIndexStatus",
+    "IndexRefreshReport",
+    "TaskContextRequest",
+    "TaskOutcomeRequest",
+    "TaskContextResponse",
 ]
-

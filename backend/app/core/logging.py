@@ -9,7 +9,7 @@ def setup_logging():
         level=log_level,
         format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
         handlers=[
-            logging.StreamHandler(sys.stdout)
+            logging.StreamHandler(sys.stderr)
         ]
     )
     return logging.getLogger("agentgit")

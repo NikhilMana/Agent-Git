@@ -6,6 +6,12 @@ from backend.app.models.commit import Commit
 from backend.app.models.snapshot import SnapshotItem
 from backend.app.models.memory import MemoryItem, MemoryDecision
 from backend.app.models.audit import AuditEvent
+from backend.app.models.codebase_index import (
+    RepositoryIndexMeta,
+    CodebaseFileRecord,
+    CodebaseSymbolRecord,
+    CodebaseDependencyRecord,
+)
 
 __all__ = [
     "ConversationSession",
@@ -17,5 +23,8 @@ __all__ = [
     "MemoryItem",
     "MemoryDecision",
     "AuditEvent",
+    "RepositoryIndexMeta",
+    "CodebaseFileRecord",
+    "CodebaseSymbolRecord",
+    "CodebaseDependencyRecord",
 ]
-

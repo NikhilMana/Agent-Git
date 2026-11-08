@@ -9,7 +9,12 @@ from backend.app.core.logging import logger
 
 
 def tokenize(text: str) -> List[str]:
-    return [w for w in re.findall(r"\w+", text.lower()) if len(w) > 1]
+    raw_tokens = [w for w in re.findall(r"[A-Za-z0-9]+", text.lower()) if len(w) > 1]
+    expanded = list(raw_tokens)
+    for w in raw_tokens:
+        if w.endswith("s") and len(w) > 3:
+            expanded.append(w[:-1])
+    return expanded
 
 
 class RetrievalService:
