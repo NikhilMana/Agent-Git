@@ -1,0 +1,1167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AgentGit — Versioned Memory Layer for AI Agents</title>
+  <style>
+    :root {
+      --bg-base: #0f141c;
+      --bg-surface: #181f2a;
+      --bg-elevated: #222b3a;
+      --border-color: #2b3648;
+      --border-subtle: #1e2634;
+      --text-main: #f1f5f9;
+      --text-muted: #94a3b8;
+      --text-dim: #64748b;
+      --accent-cyan: #06b6d4;
+      --accent-cyan-bg: rgba(6, 182, 212, 0.12);
+      --accent-green: #10b981;
+      --accent-green-bg: rgba(16, 185, 129, 0.12);
+      --accent-amber: #f59e0b;
+      --accent-amber-bg: rgba(245, 158, 11, 0.12);
+      --accent-rose: #f43f5e;
+      --accent-rose-bg: rgba(244, 63, 94, 0.12);
+      --accent-indigo: #6366f1;
+      --accent-indigo-bg: rgba(99, 102, 241, 0.12);
+      --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background-color: var(--bg-base);
+      color: var(--text-main);
+      font-family: var(--font-sans);
+      font-size: 14px;
+      line-height: 1.5;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* Top Nav */
+    header {
+      background-color: var(--bg-surface);
+      border-bottom: 1px solid var(--border-color);
+      padding: 10px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 52px;
+      flex-shrink: 0;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 700;
+      font-size: 16px;
+      letter-spacing: -0.5px;
+    }
+    .brand-badge {
+      font-size: 11px;
+      padding: 2px 7px;
+      border-radius: 4px;
+      background: var(--accent-cyan-bg);
+      color: var(--accent-cyan);
+      border: 1px solid rgba(6, 182, 212, 0.3);
+      font-family: var(--font-mono);
+      font-weight: 600;
+    }
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .status-indicator {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--accent-green);
+      box-shadow: 0 0 6px var(--accent-green);
+    }
+
+    /* Layout */
+    .app-container {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: 260px;
+      background: var(--bg-surface);
+      border-right: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+    }
+    .sidebar-section {
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+    .sidebar-title {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: var(--text-dim);
+      font-weight: 700;
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .select-input {
+      width: 100%;
+      padding: 8px 10px;
+      background: var(--bg-base);
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      border-radius: 6px;
+      font-size: 13px;
+      outline: none;
+    }
+    .branch-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      max-height: 220px;
+      overflow-y: auto;
+    }
+    .branch-item {
+      padding: 7px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-family: var(--font-mono);
+      font-size: 12.5px;
+      color: var(--text-muted);
+      transition: all 0.15s ease;
+    }
+    .branch-item:hover {
+      background: var(--bg-elevated);
+      color: var(--text-main);
+    }
+    .branch-item.active {
+      background: var(--accent-indigo-bg);
+      color: var(--accent-indigo);
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      font-weight: 600;
+    }
+
+    /* Main Content Area */
+    .main-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      background: var(--bg-base);
+    }
+
+    /* Action bar */
+    .action-bar {
+      padding: 12px 20px;
+      background: var(--bg-surface);
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-shrink: 0;
+    }
+    .active-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 13px;
+    }
+    .pill {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      padding: 3px 8px;
+      border-radius: 4px;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-color);
+      color: var(--text-muted);
+    }
+    .pill-green {
+      background: var(--accent-green-bg);
+      color: var(--accent-green);
+      border-color: rgba(16, 185, 129, 0.3);
+    }
+    .btn-group {
+      display: flex;
+      gap: 8px;
+    }
+    button {
+      padding: 6px 12px;
+      border-radius: 6px;
+      border: 1px solid var(--border-color);
+      background: var(--bg-elevated);
+      color: var(--text-main);
+      font-size: 12.5px;
+      font-weight: 500;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: background 0.15s, border-color 0.15s;
+    }
+    button:hover {
+      background: #2c374b;
+      border-color: var(--text-dim);
+    }
+    button.btn-primary {
+      background: var(--accent-cyan);
+      color: #04242e;
+      border-color: var(--accent-cyan);
+      font-weight: 600;
+    }
+    button.btn-primary:hover {
+      background: #0891b2;
+    }
+    button.btn-danger {
+      background: var(--accent-rose-bg);
+      color: var(--accent-rose);
+      border-color: rgba(244, 63, 94, 0.3);
+    }
+
+    /* Content Panes */
+    .panes-wrapper {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      overflow: hidden;
+    }
+    .pane {
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      border-right: 1px solid var(--border-color);
+    }
+    .pane:last-child {
+      border-right: none;
+    }
+    .pane-header {
+      padding: 10px 18px;
+      background: var(--bg-surface);
+      border-bottom: 1px solid var(--border-color);
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-shrink: 0;
+    }
+    .pane-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    /* Memory Cards */
+    .topic-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .topic-label {
+      font-size: 11px;
+      font-family: var(--font-mono);
+      font-weight: 700;
+      color: var(--accent-cyan);
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .memory-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 12px 14px;
+      transition: border-color 0.15s, transform 0.1s;
+      cursor: pointer;
+    }
+    .memory-card:hover {
+      border-color: #3b475d;
+      background: #1c2432;
+    }
+    .memory-card.selected {
+      border-color: var(--accent-cyan);
+      box-shadow: 0 0 0 1px var(--accent-cyan);
+    }
+    .card-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 6px;
+    }
+    .tag {
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      font-family: var(--font-mono);
+    }
+    .tag-decision { background: var(--accent-green-bg); color: var(--accent-green); border: 1px solid rgba(16, 185, 129, 0.25); }
+    .tag-constraint { background: var(--accent-rose-bg); color: var(--accent-rose); border: 1px solid rgba(244, 63, 94, 0.25); }
+    .tag-preference { background: var(--accent-amber-bg); color: var(--accent-amber); border: 1px solid rgba(245, 158, 11, 0.25); }
+    .tag-fact { background: var(--accent-indigo-bg); color: var(--accent-indigo); border: 1px solid rgba(99, 102, 241, 0.25); }
+    .card-content {
+      font-size: 13.5px;
+      color: var(--text-main);
+      margin-bottom: 8px;
+      line-height: 1.45;
+    }
+    .card-meta {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 11px;
+      color: var(--text-dim);
+      font-family: var(--font-mono);
+    }
+
+    /* Timeline Commits */
+    .commit-timeline {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .commit-node {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 10px 12px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .commit-node:hover {
+      border-color: #3b475d;
+      background: #1c2432;
+    }
+    .commit-node.active-commit {
+      border-color: var(--accent-cyan);
+      background: rgba(6, 182, 212, 0.05);
+    }
+    .commit-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 4px;
+    }
+    .commit-hash {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--accent-cyan);
+      font-weight: 600;
+    }
+    .commit-msg {
+      font-size: 12.5px;
+      color: var(--text-main);
+      font-weight: 500;
+      margin-bottom: 4px;
+    }
+    .commit-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 10.5px;
+      color: var(--text-dim);
+      font-family: var(--font-mono);
+    }
+
+    /* Modals */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(2px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+    }
+    .modal-box {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      width: 600px;
+      max-width: 90vw;
+      max-height: 85vh;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+    }
+    .modal-header {
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--border-color);
+      font-size: 15px;
+      font-weight: 700;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .modal-body {
+      padding: 20px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .modal-footer {
+      padding: 12px 20px;
+      border-top: 1px solid var(--border-color);
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+    }
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .form-group label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+    .form-group input, .form-group textarea, .form-group select {
+      background: var(--bg-base);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      padding: 8px 10px;
+      color: var(--text-main);
+      font-family: inherit;
+      font-size: 13px;
+      outline: none;
+    }
+    .candidate-row {
+      background: var(--bg-base);
+      border: 1px solid var(--border-subtle);
+      border-radius: 6px;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .candidate-row select {
+      padding: 4px 8px;
+      font-size: 11.5px;
+      border-radius: 4px;
+      background: var(--bg-elevated);
+      color: var(--text-main);
+      border: 1px solid var(--border-color);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Navigation Bar -->
+  <header>
+    <div class="brand">
+      <span>AgentGit</span>
+      <span class="brand-badge">MVP v0.1.0</span>
+      <span style="font-size: 12px; font-weight: normal; color: var(--text-dim); margin-left: 8px;">Versioned Context Memory Layer</span>
+    </div>
+    <div class="header-actions">
+      <div class="status-indicator">
+        <div class="dot"></div>
+        <span>Service Ready (Deterministic Core)</span>
+      </div>
+      <button onclick="openIngestModal()" class="btn-primary">+ Ingest Conversation</button>
+      <button onclick="openQueryModal()">Query Memory</button>
+    </div>
+  </header>
+
+  <!-- App Layout -->
+  <div class="app-container">
+
+    <!-- Left Sidebar: Repositories & Branches -->
+    <aside class="sidebar">
+      <div class="sidebar-section">
+        <div class="sidebar-title">
+          <span>Repository</span>
+          <button onclick="createNewRepo()" style="padding: 2px 6px; font-size: 11px;">+ New</button>
+        </div>
+        <select id="repoSelect" class="select-input" onchange="onRepoChanged()"></select>
+      </div>
+
+      <div class="sidebar-section" style="flex: 1; overflow-y: auto;">
+        <div class="sidebar-title">
+          <span>Branches</span>
+          <button onclick="openBranchModal()" style="padding: 2px 6px; font-size: 11px;">+ Branch</button>
+        </div>
+        <ul id="branchList" class="branch-list"></ul>
+      </div>
+
+      <div class="sidebar-section" style="background: var(--bg-base); font-size: 11px; color: var(--text-dim);">
+        <div>Persistence: <strong>SQLite (ACID)</strong></div>
+        <div>Mode: <strong>Deterministic Fallback</strong></div>
+        <div>SHA-256 Verified Snapshots</div>
+      </div>
+    </aside>
+
+    <!-- Main Workspace -->
+    <main class="main-content">
+
+      <!-- Action Toolbar -->
+      <div class="action-bar">
+        <div class="active-info">
+          <span>Branch: <strong id="activeBranchLabel">main</strong></span>
+          <span class="pill" id="commitHashPill">HEAD: none</span>
+          <span class="pill pill-green" id="integrityBadge">Integrity: Verified</span>
+        </div>
+        <div class="btn-group">
+          <button onclick="openCommitModal()">+ New Commit</button>
+          <button onclick="openMergeModal()">Merge Branch</button>
+          <button onclick="restoreSelectedSnapshot()" id="restoreBtn" disabled>Restore Snapshot</button>
+        </div>
+      </div>
+
+      <!-- Split View Panes -->
+      <div class="panes-wrapper">
+
+        <!-- Active Snapshot Memory Items -->
+        <section class="pane">
+          <div class="pane-header">
+            <span>Active Memory Snapshot (<span id="itemCount">0</span> items)</span>
+            <span style="font-size: 11px; font-weight: normal; color: var(--text-muted);">Immutable State</span>
+          </div>
+          <div class="pane-body" id="memoryItemsContainer">
+            <div style="color: var(--text-dim); text-align: center; margin-top: 40px;">
+              No active memory snapshot. Ingest a conversation or commit items to begin.
+            </div>
+          </div>
+        </section>
+
+        <!-- Commit History Timeline -->
+        <section class="pane">
+          <div class="pane-header">
+            <span>Commit Timeline</span>
+            <span style="font-size: 11px; font-weight: normal; color: var(--text-muted);" id="commitCount">0 commits</span>
+          </div>
+          <div class="pane-body" id="commitTimelineContainer">
+            <div style="color: var(--text-dim); text-align: center; margin-top: 40px;">
+              No commits yet.
+            </div>
+          </div>
+        </section>
+
+      </div>
+    </main>
+
+  </div>
+
+  <!-- Ingest & Review Modal -->
+  <div id="ingestModal" class="modal-overlay">
+    <div class="modal-box" style="width: 700px;">
+      <div class="modal-header">
+        <span>Ingest Conversation & Candidate Preview</span>
+        <button onclick="closeModal('ingestModal')" style="border: none; background: transparent; font-size: 16px;">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label>Load Synthetic Scenario</label>
+          <button onclick="loadSampleConversation()" style="width: fit-content; font-size: 12px;">Load Sample Data (Cloud Architecture)</button>
+        </div>
+        <div class="form-group">
+          <label>Session Title</label>
+          <input type="text" id="sessionTitleInput" placeholder="Session Title (e.g. Architecture Sync)" value="Architecture Sync">
+        </div>
+        <div class="form-group">
+          <label>Conversation JSON</label>
+          <textarea id="conversationJsonInput" rows="6" placeholder='[{"role": "user", "content": "..."}]'></textarea>
+        </div>
+        <div id="candidateReviewArea" style="display: none; flex-direction: column; gap: 8px;">
+          <label style="font-weight: 700; font-size: 12px;">Extracted Candidates & Retention Decisions:</label>
+          <div id="candidatesList" style="max-height: 200px; overflow-y: auto; display: flex; flex-direction: column; gap: 6px;"></div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button onclick="previewCandidates()" id="previewBtn">Preview & Classify</button>
+        <button onclick="commitReviewedCandidates()" id="commitCandidatesBtn" class="btn-primary" style="display: none;">Commit Reviewed to Branch</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Branch Creation Modal -->
+  <div id="branchModal" class="modal-overlay">
+    <div class="modal-box">
+      <div class="modal-header">
+        <span>Create New Branch</span>
+        <button onclick="closeModal('branchModal')" style="border: none; background: transparent;">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label>Branch Name</label>
+          <input type="text" id="newBranchNameInput" placeholder="e.g. experiment-db, alternative-plan">
+        </div>
+        <div class="form-group">
+          <label>From Commit ID (Leave blank for current HEAD)</label>
+          <input type="text" id="fromCommitIdInput" placeholder="Optional commit UUID">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button onclick="closeModal('branchModal')">Cancel</button>
+        <button onclick="submitNewBranch()" class="btn-primary">Create Branch</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Merge Modal -->
+  <div id="mergeModal" class="modal-overlay">
+    <div class="modal-box" style="width: 650px;">
+      <div class="modal-header">
+        <span>Merge Branch (Explicit Selection & Conflict Detection)</span>
+        <button onclick="closeModal('mergeModal')" style="border: none; background: transparent;">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label>Source Branch</label>
+          <select id="mergeSourceBranchSelect" onchange="onMergeSourceChanged()"></select>
+        </div>
+        <div class="form-group">
+          <label>Target Branch</label>
+          <input type="text" id="mergeTargetBranchInput" readonly style="opacity: 0.7;">
+        </div>
+        <div class="form-group">
+          <label>Select Items to Merge from Source</label>
+          <div id="mergeItemsList" style="max-height: 180px; overflow-y: auto; border: 1px solid var(--border-color); border-radius: 6px; padding: 8px;"></div>
+        </div>
+        <div id="conflictAlert" style="display: none; padding: 10px; background: var(--accent-rose-bg); border: 1px solid rgba(244, 63, 94, 0.4); border-radius: 6px; color: var(--accent-rose); font-size: 12px;"></div>
+      </div>
+      <div class="modal-footer">
+        <button onclick="closeModal('mergeModal')">Cancel</button>
+        <button onclick="executeMerge()" class="btn-primary">Execute Merge</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Retrieval Modal -->
+  <div id="queryModal" class="modal-overlay">
+    <div class="modal-box" style="width: 650px;">
+      <div class="modal-header">
+        <span>Retrieve Context Memory with Provenance</span>
+        <button onclick="closeModal('queryModal')" style="border: none; background: transparent;">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label>Query String</label>
+          <input type="text" id="retrievalQueryInput" placeholder="e.g. Which database did we choose?">
+        </div>
+        <button onclick="runMemoryRetrieval()" class="btn-primary" style="align-self: flex-start;">Run Lexical Search</button>
+        <div id="retrievalResultsArea" style="display: none; flex-direction: column; gap: 8px; margin-top: 10px;">
+          <label style="font-weight: 700; font-size: 12px;">Ranked Results with Evidence:</label>
+          <div id="retrievalResultsList" style="max-height: 250px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px;"></div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button onclick="closeModal('queryModal')">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Frontend Logic -->
+  <script>
+    let currentRepoId = null;
+    let currentBranch = "main";
+    let activeCommitId = null;
+    let previewedCandidates = [];
+    let selectedCommitForRestore = null;
+
+    async function init() {
+      await loadRepositories();
+    }
+
+    async function loadRepositories() {
+      try {
+        const res = await fetch("/api/v1/repositories");
+        const repos = await res.json();
+        const sel = document.getElementById("repoSelect");
+        sel.innerHTML = "";
+        if (repos.length === 0) {
+          // Create default
+          const createRes = await fetch("/api/v1/repositories", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ name: "default", description: "Default AgentGit Repository" })
+          });
+          const defRepo = await createRes.json();
+          repos.push(defRepo);
+        }
+        repos.forEach(r => {
+          const opt = document.createElement("option");
+          opt.value = r.id;
+          opt.textContent = r.name;
+          sel.appendChild(opt);
+        });
+        currentRepoId = repos[0].id;
+        await loadBranches();
+      } catch (e) {
+        console.error("Error loading repositories:", e);
+      }
+    }
+
+    async function loadBranches() {
+      if (!currentRepoId) return;
+      try {
+        const res = await fetch(`/api/v1/repositories/${currentRepoId}/branches`);
+        const branches = await res.json();
+        const list = document.getElementById("branchList");
+        list.innerHTML = "";
+        branches.forEach(b => {
+          const li = document.createElement("li");
+          li.className = `branch-item ${b.name === currentBranch ? 'active' : ''}`;
+          li.innerHTML = `<span>⑂ ${b.name}</span> <span style="font-size:10px; opacity:0.6;">${b.head_commit_id ? b.head_commit_id.slice(0,6) : 'empty'}</span>`;
+          li.onclick = () => switchBranch(b.name);
+          list.appendChild(li);
+        });
+        document.getElementById("activeBranchLabel").textContent = currentBranch;
+        await loadBranchHistory();
+      } catch (e) {
+        console.error("Error loading branches:", e);
+      }
+    }
+
+    async function switchBranch(name) {
+      currentBranch = name;
+      await loadBranches();
+    }
+
+    async function loadBranchHistory() {
+      if (!currentRepoId || !currentBranch) return;
+      try {
+        const res = await fetch(`/api/v1/repositories/${currentRepoId}/branches/${currentBranch}/history`);
+        const data = await res.json();
+        const commits = data.commits || [];
+        document.getElementById("commitCount").textContent = `${commits.length} commits`;
+
+        const timeline = document.getElementById("commitTimelineContainer");
+        timeline.innerHTML = "";
+
+        if (commits.length === 0) {
+          timeline.innerHTML = `<div style="color: var(--text-dim); text-align: center; margin-top: 40px;">No commits on branch '${currentBranch}' yet.</div>`;
+          document.getElementById("commitHashPill").textContent = "HEAD: none";
+          activeCommitId = null;
+          loadCommitSnapshot(null);
+          return;
+        }
+
+        activeCommitId = commits[0].id;
+        document.getElementById("commitHashPill").textContent = `HEAD: ${commits[0].id.slice(0, 8)}`;
+
+        commits.forEach((c, idx) => {
+          const node = document.createElement("div");
+          node.className = `commit-node ${c.id === activeCommitId ? 'active-commit' : ''}`;
+          node.onclick = () => {
+            document.querySelectorAll(".commit-node").forEach(n => n.classList.remove("active-commit"));
+            node.classList.add("active-commit");
+            selectedCommitForRestore = c.id;
+            document.getElementById("restoreBtn").disabled = false;
+            loadCommitSnapshot(c.id);
+          };
+          node.innerHTML = `
+            <div class="commit-header">
+              <span class="commit-hash">${c.id.slice(0, 8)}</span>
+              <span style="font-size: 10px; color: var(--text-dim);">${new Date(c.created_at).toLocaleTimeString()}</span>
+            </div>
+            <div class="commit-msg">${escapeHtml(c.message)}</div>
+            <div class="commit-footer">
+              <span>Parents: ${c.parent_commit_ids.map(p => p.slice(0, 6)).join(", ") || "none"}</span>
+              <span style="color: var(--accent-green);">#${c.items ? c.items.length : 0} items</span>
+            </div>
+          `;
+          timeline.appendChild(node);
+        });
+
+        loadCommitSnapshot(commits[0].id);
+      } catch (e) {
+        console.error("Error loading branch history:", e);
+      }
+    }
+
+    async function loadCommitSnapshot(commitId) {
+      const container = document.getElementById("memoryItemsContainer");
+      if (!commitId) {
+        container.innerHTML = `<div style="color: var(--text-dim); text-align: center; margin-top: 40px;">Branch has no snapshots yet.</div>`;
+        document.getElementById("itemCount").textContent = "0";
+        return;
+      }
+
+      try {
+        const res = await fetch(`/api/v1/commits/${commitId}`);
+        const commit = await res.json();
+        const items = commit.items || [];
+        document.getElementById("itemCount").textContent = items.length;
+
+        container.innerHTML = "";
+        const grouped = {};
+        items.forEach(i => {
+          const topic = i.topic_at_commit || "general";
+          if (!grouped[topic]) grouped[topic] = [];
+          grouped[topic].push(i);
+        });
+
+        for (const [topic, topicItems] of Object.entries(grouped)) {
+          const groupDiv = document.createElement("div");
+          groupDiv.className = "topic-group";
+          groupDiv.innerHTML = `<div class="topic-label">● ${topic}</div>`;
+
+          topicItems.forEach(item => {
+            const card = document.createElement("div");
+            card.className = "memory-card";
+            const tagClass = `tag-${item.category_at_commit || 'fact'}`;
+            card.innerHTML = `
+              <div class="card-top">
+                <span class="tag ${tagClass}">${item.category_at_commit}</span>
+                <span style="font-family: var(--font-mono); font-size: 11px; color: var(--accent-cyan);">${item.logical_key || ''}</span>
+              </div>
+              <div class="card-content">${escapeHtml(item.content_at_commit)}</div>
+              <div class="card-meta">
+                <span>Action: ${item.retention_action_at_commit}</span>
+                <span>•</span>
+                <span>Provenance: [${item.source_message_ids.map(s => s.slice(0, 6)).join(", ")}]</span>
+              </div>
+            `;
+            groupDiv.appendChild(card);
+          });
+          container.appendChild(groupDiv);
+        }
+      } catch (e) {
+        console.error("Error loading snapshot:", e);
+      }
+    }
+
+    function openIngestModal() {
+      document.getElementById("ingestModal").style.display = "flex";
+    }
+
+    function openBranchModal() {
+      document.getElementById("branchModal").style.display = "flex";
+    }
+
+    function openQueryModal() {
+      document.getElementById("queryModal").style.display = "flex";
+    }
+
+    function closeModal(id) {
+      document.getElementById(id).style.display = "none";
+    }
+
+    async function loadSampleConversation() {
+      try {
+        const res = await fetch("/sample_data/conversation_project.json");
+        // Fallback to inline sample if path not directly accessible
+        const sample = [
+          {"role": "user", "content": "We decided to use PostgreSQL version 16 with pgvector for persistent storage."},
+          {"role": "user", "content": "We will use FastAPI for the backend REST API on port 8000."},
+          {"role": "user", "content": "Crucial security rule: we must never commit database credentials or API secrets."},
+          {"role": "assistant", "content": "Understood, noted the security constraints and stack."}
+        ];
+        document.getElementById("conversationJsonInput").value = JSON.stringify(sample, null, 2);
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    async function previewCandidates() {
+      const text = document.getElementById("conversationJsonInput").value.trim();
+      if (!text) { alert("Please provide conversation messages."); return; }
+      try {
+        const messages = JSON.parse(text);
+        const title = document.getElementById("sessionTitleInput").value;
+
+        // 1. Create session
+        const sessRes = await fetch("/api/v1/sessions", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ title })
+        });
+        const sess = await sessRes.json();
+
+        // 2. Ingest messages
+        await fetch(`/api/v1/sessions/${sess.id}/messages`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ messages })
+        });
+
+        // 3. Preview candidates
+        const prevRes = await fetch(`/api/v1/sessions/${sess.id}/memory/preview`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ mode: "deterministic" })
+        });
+        const prevData = await prevRes.json();
+        previewedCandidates = prevData.candidates || [];
+
+        const listDiv = document.getElementById("candidatesList");
+        listDiv.innerHTML = "";
+        previewedCandidates.forEach((c, idx) => {
+          const row = document.createElement("div");
+          row.className = "candidate-row";
+          row.innerHTML = `
+            <div style="display: flex; justify-content: space-between; font-size: 11px;">
+              <span><strong>(${c.category})</strong> ${c.logical_key || ''}</span>
+              <select onchange="previewedCandidates[${idx}].action = this.value">
+                <option value="retain" ${c.action === 'retain' ? 'selected' : ''}>retain</option>
+                <option value="summarize" ${c.action === 'summarize' ? 'selected' : ''}>summarize</option>
+                <option value="discard" ${c.action === 'discard' ? 'selected' : ''}>discard</option>
+              </select>
+            </div>
+            <div style="font-size: 12.5px;">${escapeHtml(c.content)}</div>
+            <div style="font-size: 10.5px; color: var(--text-dim);">${escapeHtml(c.rationale)}</div>
+          `;
+          listDiv.appendChild(row);
+        });
+
+        document.getElementById("candidateReviewArea").style.display = "flex";
+        document.getElementById("commitCandidatesBtn").style.display = "inline-flex";
+      } catch (e) {
+        alert("Invalid JSON or server error: " + e.message);
+      }
+    }
+
+    async function commitReviewedCandidates() {
+      const items = previewedCandidates
+        .filter(c => c.action === "retain" || c.action === "summarize")
+        .map(c => ({
+          logical_key: c.logical_key,
+          content: c.content,
+          category: c.category,
+          topic: c.topic,
+          source_message_ids: c.source_message_ids,
+          rationale: c.rationale,
+          confidence: c.confidence,
+          retention_action: c.action
+        }));
+
+      if (items.length === 0) {
+        alert("No items selected to retain or summarize.");
+        return;
+      }
+
+      try {
+        const res = await fetch(`/api/v1/repositories/${currentRepoId}/commits`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            branch: currentBranch,
+            message: "Commit from ingested conversation review",
+            items
+          })
+        });
+        if (res.ok) {
+          closeModal("ingestModal");
+          await loadBranchHistory();
+        } else {
+          const err = await res.json();
+          alert("Commit error: " + JSON.stringify(err));
+        }
+      } catch (e) {
+        alert("Error: " + e.message);
+      }
+    }
+
+    async function submitNewBranch() {
+      const name = document.getElementById("newBranchNameInput").value.trim();
+      const fromCommit = document.getElementById("fromCommitIdInput").value.trim() || activeCommitId;
+      if (!name) { alert("Enter branch name"); return; }
+      try {
+        const res = await fetch(`/api/v1/repositories/${currentRepoId}/branches`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ name, from_commit_id: fromCommit })
+        });
+        if (res.ok) {
+          closeModal("branchModal");
+          currentBranch = name;
+          await loadBranches();
+        } else {
+          const err = await res.json();
+          alert("Branch error: " + JSON.stringify(err));
+        }
+      } catch (e) {
+        alert(e.message);
+      }
+    }
+
+    async function restoreSelectedSnapshot() {
+      if (!selectedCommitForRestore) {
+        alert("Select a commit from the timeline first.");
+        return;
+      }
+      if (!confirm(`Restore branch '${currentBranch}' state from snapshot ${selectedCommitForRestore.slice(0, 8)}? (This will create a new non-destructive commit)`)) return;
+
+      try {
+        const res = await fetch(`/api/v1/repositories/${currentRepoId}/branches/${currentBranch}/restore`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ commit_id: selectedCommitForRestore, message: `Restore snapshot ${selectedCommitForRestore.slice(0, 8)}` })
+        });
+        if (res.ok) {
+          await loadBranchHistory();
+        } else {
+          const err = await res.json();
+          alert("Restore error: " + JSON.stringify(err));
+        }
+      } catch (e) {
+        alert(e.message);
+      }
+    }
+
+    async function openMergeModal() {
+      document.getElementById("mergeTargetBranchInput").value = currentBranch;
+      const res = await fetch(`/api/v1/repositories/${currentRepoId}/branches`);
+      const branches = await res.json();
+      const sel = document.getElementById("mergeSourceBranchSelect");
+      sel.innerHTML = "";
+      branches.filter(b => b.name !== currentBranch).forEach(b => {
+        const opt = document.createElement("option");
+        opt.value = b.name;
+        opt.textContent = b.name;
+        sel.appendChild(opt);
+      });
+      document.getElementById("mergeModal").style.display = "flex";
+      await onMergeSourceChanged();
+    }
+
+    async function onMergeSourceChanged() {
+      const src = document.getElementById("mergeSourceBranchSelect").value;
+      if (!src) return;
+      const res = await fetch(`/api/v1/repositories/${currentRepoId}/branches/${src}/history`);
+      const data = await res.json();
+      const itemsList = document.getElementById("mergeItemsList");
+      itemsList.innerHTML = "";
+      if (!data.commits || data.commits.length === 0) {
+        itemsList.innerHTML = "<div style='color: var(--text-dim);'>Source branch has no commits.</div>";
+        return;
+      }
+      const head = data.commits[0];
+      (head.items || []).forEach(item => {
+        const row = document.createElement("div");
+        row.style.cssText = "display: flex; gap: 8px; margin-bottom: 6px; font-size: 12px;";
+        row.innerHTML = `
+          <input type="checkbox" value="${item.memory_item_id}" class="merge-item-chk" checked>
+          <span><strong>[${item.logical_key || item.topic_at_commit}]</strong> ${escapeHtml(item.content_at_commit)}</span>
+        `;
+        itemsList.appendChild(row);
+      });
+    }
+
+    async function executeMerge() {
+      const src = document.getElementById("mergeSourceBranchSelect").value;
+      const chks = Array.from(document.querySelectorAll(".merge-item-chk:checked")).map(c => c.value);
+      if (chks.length === 0) { alert("Select at least one item to merge."); return; }
+
+      const conflictDiv = document.getElementById("conflictAlert");
+      conflictDiv.style.display = "none";
+
+      try {
+        const res = await fetch(`/api/v1/repositories/${currentRepoId}/merge`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            source_branch: src,
+            target_branch: currentBranch,
+            selected_memory_item_ids: chks,
+            message: `Merge selected items from ${src}`
+          })
+        });
+
+        if (res.status === 409) {
+          const conflictData = await res.json();
+          conflictDiv.style.display = "block";
+          conflictDiv.innerHTML = `<strong>Merge Conflict:</strong> ${conflictData.error.message}<br>` +
+            conflictData.conflicts.map(c => `• ${c.conflict_reason}`).join("<br>");
+          return;
+        }
+
+        if (res.ok) {
+          closeModal("mergeModal");
+          await loadBranchHistory();
+        } else {
+          const err = await res.json();
+          alert("Merge error: " + JSON.stringify(err));
+        }
+      } catch (e) {
+        alert(e.message);
+      }
+    }
+
+    async function runMemoryRetrieval() {
+      const q = document.getElementById("retrievalQueryInput").value.trim();
+      if (!q) return;
+      try {
+        const res = await fetch(`/api/v1/repositories/${currentRepoId}/retrieve`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ query: q, branch: currentBranch, top_k: 5 })
+        });
+        const data = await res.json();
+        const area = document.getElementById("retrievalResultsArea");
+        const list = document.getElementById("retrievalResultsList");
+        area.style.display = "flex";
+        list.innerHTML = "";
+
+        if (!data.results || data.results.length === 0) {
+          list.innerHTML = "<div style='color: var(--text-dim);'>No relevant memories found.</div>";
+          return;
+        }
+
+        data.results.forEach(r => {
+          const item = document.createElement("div");
+          item.className = "memory-card";
+          item.innerHTML = `
+            <div class="card-top">
+              <span class="tag tag-decision">Score: ${r.score}</span>
+              <span style="font-family: var(--font-mono); font-size: 11px; color: var(--accent-cyan);">${r.topic}</span>
+            </div>
+            <div class="card-content">${escapeHtml(r.content)}</div>
+            <div class="card-meta">
+              <span>Provenance: [${r.source_message_ids.map(s => s.slice(0, 6)).join(", ")}]</span>
+              <span>•</span>
+              <span>Commit: ${r.commit_id.slice(0, 8)}</span>
+            </div>
+          `;
+          list.appendChild(item);
+        });
+      } catch (e) {
+        alert("Retrieval error: " + e.message);
+      }
+    }
+
+    function escapeHtml(str) {
+      if (!str) return "";
+      return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    }
+
+    window.onload = init;
+  </script>
+</body>
+</html>
+

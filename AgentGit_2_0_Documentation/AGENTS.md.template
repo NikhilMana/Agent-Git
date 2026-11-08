@@ -1,0 +1,13 @@
+# AgentGit Context Protocol
+
+For every substantial task in this workspace:
+
+1. Call `agentgit_get_task_context` with the task, repository ID, current branch and a reasonable context budget.
+2. Use returned decisions, constraints and file/symbol references as navigation guidance.
+3. Inspect current source files and tests before editing.
+4. If coverage is partial/low or context is stale, request more context or search/refresh the repository index.
+5. Do not treat memory summaries as source-code truth.
+6. Do not scan the entire repository by default; expand exploration when dependencies or uncertainty require it.
+7. After completing work, call `agentgit_record_task_outcome` with verified decisions, changed files, tests and unresolved issues.
+8. Never claim a test passed unless it was actually run.
+9. Do not store secrets or credentials in AgentGit.

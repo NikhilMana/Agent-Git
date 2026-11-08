@@ -1,0 +1,32 @@
+{
+  "timestamp": "2026-11-08T20:16:09Z",
+  "conditions": {
+    "full_history": {
+      "context_tokens": 171,
+      "gold_fact_recall": 100.0,
+      "provenance_accuracy": 0.0,
+      "median_retrieval_latency_ms": 0.0
+    },
+    "naive_summary": {
+      "context_tokens": 137,
+      "gold_fact_recall": 75.0,
+      "provenance_accuracy": 0.0,
+      "median_retrieval_latency_ms": 0.0
+    },
+    "simple_retrieval": {
+      "context_tokens": 64,
+      "gold_fact_recall": 75.0,
+      "provenance_accuracy": 50.0,
+      "median_retrieval_latency_ms": 2.86
+    },
+    "agentgit": {
+      "context_tokens": 62,
+      "token_reduction_pct": 63.7,
+      "gold_fact_recall": 100.0,
+      "provenance_accuracy": 50.0,
+      "median_retrieval_latency_ms": 3.57,
+      "p95_retrieval_latency_ms": 30.96,
+      "version_integrity_verified": true
+    }
+  }
+}

@@ -1,0 +1,72 @@
+{
+  "title": "Cloud Platform Architecture & Infrastructure Discussion",
+  "messages": [
+    {
+      "role": "user",
+      "content": "Hello team, let's discuss the architectural foundation for our new analytics service."
+    },
+    {
+      "role": "assistant",
+      "content": "Hi! Sounds good. Let's start with the database and runtime choices."
+    },
+    {
+      "role": "user",
+      "content": "We decided to use PostgreSQL version 16 with pgvector for persistent storage."
+    },
+    {
+      "role": "assistant",
+      "content": "Understood. PostgreSQL 16 with pgvector gives us relational data guarantees plus vector similarity."
+    },
+    {
+      "role": "user",
+      "content": "We will use FastAPI for the backend REST API on port 8000."
+    },
+    {
+      "role": "user",
+      "content": "Crucial security rule: we must never commit database credentials or API secrets in repository files."
+    },
+    {
+      "role": "assistant",
+      "content": "Agreed. All secrets must be loaded exclusively via environment variables."
+    },
+    {
+      "role": "user",
+      "content": "I prefer using Poetry or standard pyproject.toml for Python dependency management."
+    },
+    {
+      "role": "user",
+      "content": "TODO: Implement OAuth2 token validation with RS256 signing by 2026-12-01."
+    },
+    {
+      "role": "assistant",
+      "content": "Understood, noted the deadline and the signing scheme."
+    },
+    {
+      "role": "user",
+      "content": "Thanks, talk soon!"
+    }
+  ],
+  "gold_facts": [
+    {
+      "query": "Which database was chosen for storage?",
+      "expected_fact": "PostgreSQL version 16 with pgvector",
+      "source_index": 2
+    },
+    {
+      "query": "What framework and port will the backend use?",
+      "expected_fact": "FastAPI on port 8000",
+      "source_index": 4
+    },
+    {
+      "query": "What is the security constraint regarding secrets?",
+      "expected_fact": "Never commit credentials or secrets",
+      "source_index": 5
+    },
+    {
+      "query": "What is the token signing scheme and deadline?",
+      "expected_fact": "OAuth2 RS256 by 2026-12-01",
+      "source_index": 8
+    }
+  ]
+}
+
